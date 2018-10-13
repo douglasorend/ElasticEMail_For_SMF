@@ -1,3 +1,8 @@
+v1.3 - December 30th, 2017
+o Added code to properly determine domain name from URL.
+o Fixed issue where forum domain wasn't found in domain list from ElasticEMail.com.
+o Moved code that included the template to after the domain searching code.
+
 v1.2 - December 25th, 2017
 o Added SMF 2.1 Beta 3 support with minor change to [b]package-info.xml[/b].
 o Fixed LoadLanguage statement in [b]Subs-ElasticEMail.php[/b].

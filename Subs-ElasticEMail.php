@@ -80,11 +80,6 @@ function ElasticEMail_Settings($return_config = false)
 		array('text', 'elasticemail_key', 37, 'postinput' => '<br /><input type="submit" value="' . $txt['elasticemail_test_api'] . '" onclick="ElasticEMail_Test_API(); return false;" class="button_submit" />'),
 		
 	);
-	if (!empty($context['elasticemail_domain']))
-	{
-		$config_vars[] = array('title', 'elasticemail_test_results');
-		$config_vars[] = array('callback', 'elasticemail_table');
-	}
 	if ($return_config)
 		return $config_vars;
 
@@ -103,11 +98,8 @@ function ElasticEMail_Settings($return_config = false)
 			$_POST['elasticemail_no_ssl'] = $modSettings['elasticemail_no_ssl'] = true;
 			saveDBSettings($config_vars);
 		}
-	}
 
-	// If OpenSSL support doesn't exist, notify user:
-	if (!empty($modSettings['elasticemail_key']))
-	{
+		// If OpenSSL support doesn't exist, notify user:
 		if (empty($temp))
 			$context['settings_insert_above'] = '<div class="errorbox">' . $txt['elasticemail_no_ssl_support'] . '</div>';
 		else
@@ -116,16 +108,21 @@ function ElasticEMail_Settings($return_config = false)
 			$domains = json_decode($temp, true);
 			if (!empty($domains['success']))
 			{
-				$this_domain = parse_url($boardurl, PHP_URL_HOST);
+				$this_domain = ElasticEMail_domain($boardurl);
 				foreach ($domains['data'] as $domain)
 				{
-					if (!empty($domain['domain']) && strpos($this_domain, $domain['domain']) !== false)
+					if (!empty($domain['domain']) && strpos($domain['domain'], $this_domain) !== false)
 						$context['elasticemail_domain'] = $domain;
 				}
 			}
 			if (empty($context['elasticemail_domain']))
 				$context['settings_insert_above'] = '<div class="errorbox">' . sprintf($txt['elasticemail_no_domain_found'], $this_domain) . '</div>';
 		}
+	}
+	if (!empty($context['elasticemail_domain']))
+	{
+		$config_vars[] = array('title', 'elasticemail_test_results');
+		$config_vars[] = array('callback', 'elasticemail_table');
 	}
 
 	// Saving the settings?
@@ -141,11 +138,6 @@ function ElasticEMail_Settings($return_config = false)
 		function ElasticEMail_Test_API()
 		{
 			var api_key = document.getElementById("elasticemail_key").value;
-			if (!api_key)
-			{
-				alert(' . JavaScriptEscape($txt['elasticemail_test_failure']) . ');
-				return;
-			}
 			var xmlhttp = new XMLHttpRequest();
 			xmlhttp.onreadystatechange = function() 
 			{
@@ -173,6 +165,9 @@ function ElasticEMail_Settings($return_config = false)
 	prepareDBSettingContext($config_vars);
 }
 
+/********************************************************************************
+* Template callback function:
+********************************************************************************/
 function template_callback_elasticemail_table()
 {
 	global $context, $txt, $forum_version, $settings;
@@ -200,6 +195,49 @@ function template_callback_elasticemail_table()
 						<dd><img src="', $settings['images_url'], '/icons/', !empty($r['isrewritedomainvalid']) ? 'field_valid' : 'quick_remove', $ext, '"></dd>
 						<dt>', $txt['elasticemail_results_verify'], '</dt>
 						<dd><img src="', $settings['images_url'], '/icons/', !empty($r['verify']) ? 'field_valid' : 'quick_remove', $ext, '"></dd>';
+}
+
+/********************************************************************************
+* Subfunction that determines domain name of passed URL:
+* Solution copied & modified for SMF from: https://stackoverflow.com/a/7573307
+********************************************************************************/
+function ElasticEMail_domain($url)
+{
+	// Get sub-TLDs if not already fetched:
+	if (($subtlds = cache_get_data('ElasticEMail_subtlds', 360)) == null)
+	{
+		$subtlds = array(
+			'co.uk', 'me.uk', 'net.uk', 'org.uk', 'sch.uk', 'ac.uk', 
+			'gov.uk', 'nhs.uk', 'police.uk', 'mod.uk', 'asn.au', 'com.au',
+			'net.au', 'id.au', 'org.au', 'edu.au', 'gov.au', 'csiro.au'
+		);
+		foreach (file('http://mxr.mozilla.org/mozilla-central/source/netwerk/dns/effective_tld_names.dat?raw=1') as $num => $line)
+		{
+			$line = trim($line);
+			if($line == '' || substr($line[0], 0, 2) == '/')
+				continue;
+			$line = @preg_replace("/[^a-zA-Z0-9\.]/", '', $line);
+			if($line == '' || (isset($line[0]) && $line[0] == '.') || !strstr($line, '.')) 
+				continue;
+			$subtlds[] = $line;
+		}
+		$subtlds = array_unique($subtlds);
+		cache_put_data('ElasticEMail_subtlds', $subtlds, 360);
+	}
+	
+	// Let's try to figure out the domain name:
+    $slds = "";
+    $url = str_replace('http://', '', str_replace('https://', '', strtolower($url)));
+	$host = parse_url('http://' . $url, PHP_URL_HOST);
+    preg_match('/[^\.\/]+\.[^\.\/]+$/', $host, $matches);
+    foreach($subtlds as $sub)
+    {
+        if (preg_match('/\.' . preg_quote($sub) . '$/', $host, $xyz))
+            preg_match('/[^\.\/]+\.[^\.\/]+\.[^\.\/]+$/', $host, $matches);
+    }
+
+	// Either return the matched domain, or the host as determined by "parse_url":
+    return isset($matches[0]) ? $matches[0] : $host;
 }
 
 ?>
