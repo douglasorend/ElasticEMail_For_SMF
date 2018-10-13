@@ -1,3 +1,8 @@
+v1.0.4 - August 28th, 2017
+o Fixed undefined variable error found in [b]Subs-ElasticEmail.php[/b].
+o Modified code to allow enabling mod even if no domain information found.
+o Added message to warn user if no domain information was found.
+
 v1.0.3 - August 23rd, 2017
 o Fixed several undefined variable errors.
 o Fixed ElasticEMail URL so that mod works properly.

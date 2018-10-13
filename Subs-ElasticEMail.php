@@ -17,7 +17,7 @@ function ElasticEMail_send($recipients, $subject, $message, $from_name, $reply_t
 	global $modSettings, $webmaster_email, $context, $sourcedir;
 
 	// Are we setup to send mail through ElasticEMail.com?
-	if (!$check_api && (empty($modSettings['elasticemail_enable']) || empty($modSettings['elasticemail_key'])))
+	if (empty($modSettings['elasticemail_enable']) || empty($modSettings['elasticemail_key']))
 		return false;
 		
 	// Get everything we need in order to send emails:
@@ -87,8 +87,6 @@ function ElasticEMail_Settings($return_config = false)
 		$domains = json_decode($temp, true);
 		if (!empty($domains['success']))
 		{
-			if (strpos($boardurl, 'http://') !== 0 && strpos($boardurl, 'https://') !== 0)
-				$boardurl = 'http://' . $boardurl;
 			$this_domain = parse_url($boardurl, PHP_URL_HOST);
 			foreach ($domains['data'] as $domain)
 			{
@@ -96,11 +94,13 @@ function ElasticEMail_Settings($return_config = false)
 					$context['elasticemail_domain'] = $domain;
 			}
 		}
+		if (empty($context['elasticemail_domain']))
+			$context['settings_insert_above'] = '<div class="errorbox">' . $txt['elasticemail_no_domain_found'] . '</div>';
 	}
 
 	// Our mod configuration variables:
 	$config_vars = array(
-		array('check', 'elasticemail_enable', 'disabled' => empty($context['elasticemail_domain'])),
+		array('check', 'elasticemail_enable'),
 		array('check', 'elasticemail_no_ssl'),
 		array('text', 'elasticemail_key', 37, 'postinput' => '<br /><input type="submit" value="' . $txt['elasticemail_test_api'] . '" onclick="ElasticEMail_Test_API(); return false;" class="button_submit" />'),
 		
@@ -155,7 +155,7 @@ function ElasticEMail_Settings($return_config = false)
 
 function template_callback_elasticemail_table()
 {
-	global $context, $txt, $boardurl, $forum_version, $settings;
+	global $context, $txt, $forum_version, $settings;
 
 	// Check to see if everything is right to omit restriction message:
 	$r = array('domain' => '', 'spf' => 0, 'dkim' => 0, 'mx' => 0, 'dmarc' => 0, 'isrewritedomainvalid' => 0, 'verify' => 0);
