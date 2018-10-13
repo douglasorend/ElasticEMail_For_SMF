@@ -1,3 +1,9 @@
+v1.2 - December 25th, 2017
+o Added SMF 2.1 Beta 3 support with minor change to [b]package-info.xml[/b].
+o Fixed LoadLanguage statement in [b]Subs-ElasticEMail.php[/b].
+o Added code to attempt to discover status of OpenSSL support and set HTTPS option automatically.
+o Added check to make sure API key is entered before testing API key...
+
 v1.1 - October 17th, 2017
 o Fixed misspelling of text strings used by the mod.
 o Fixed domain-inclusion issue of the "no domain found" error message.

@@ -71,33 +71,7 @@ function ElasticEMail_Settings($return_config = false)
 
 	// Make sure we can have permission to adminstrate the forum!
 	isAllowedTo('admin_forum');
-	loadLanguage('ElasticEmail');
-
-	// Check to see if we have PHP support for OpenSSL.  If we do, pull the domain list:
-	require_once($sourcedir . '/Subs-Package.php');
-	$protocol = !empty($modSettings['elasticemail_no_ssl']) ? 'http' : 'https';
-	$temp = fetch_web_data($protocol . '://api.elasticemail.com/v2/domain/list?api_key=' . $modSettings['elasticemail_key']);
-	$context['elasticemail_domain'] = array();
-
-	// If OpenSSL support doesn't exist, notify user:
-	if (empty($temp))
-		$context['settings_insert_above'] = '<div class="errorbox">' . $txt['elasticemail_no_ssl_support'] . '</div>';
-	else
-	// Otherwise, get information about this domain from ElasticEMail:
-	{
-		$domains = json_decode($temp, true);
-		if (!empty($domains['success']))
-		{
-			$this_domain = parse_url($boardurl, PHP_URL_HOST);
-			foreach ($domains['data'] as $domain)
-			{
-				if (!empty($domain['domain']) && strpos($this_domain, $domain['domain']) !== false)
-					$context['elasticemail_domain'] = $domain;
-			}
-		}
-		if (empty($context['elasticemail_domain']))
-			$context['settings_insert_above'] = '<div class="errorbox">' . sprintf($txt['elasticemail_no_domain_found'], $this_domain) . '</div>';
-	}
+	loadLanguage('ElasticEMail');
 
 	// Our mod configuration variables:
 	$config_vars = array(
@@ -114,6 +88,46 @@ function ElasticEMail_Settings($return_config = false)
 	if ($return_config)
 		return $config_vars;
 
+	// Check to see if we have PHP support for OpenSSL.  If we do, pull the domain list:
+	require_once($sourcedir . '/Subs-Package.php');
+	$protocol = !empty($modSettings['elasticemail_no_ssl']) ? 'http' : 'https';
+	if (!empty($modSettings['elasticemail_key']))
+	{
+		while (empty($temp))
+		{
+			$temp = fetch_web_data($protocol . '://api.elasticemail.com/v2/domain/list?api_key=' . $modSettings['elasticemail_key']);
+			$context['elasticemail_domain'] = array();
+			if (!empty($temp) || $protocol == 'http')
+				break;
+			$protocol = 'http';
+			$_POST['elasticemail_no_ssl'] = $modSettings['elasticemail_no_ssl'] = true;
+			saveDBSettings($config_vars);
+		}
+	}
+
+	// If OpenSSL support doesn't exist, notify user:
+	if (!empty($modSettings['elasticemail_key']))
+	{
+		if (empty($temp))
+			$context['settings_insert_above'] = '<div class="errorbox">' . $txt['elasticemail_no_ssl_support'] . '</div>';
+		else
+		// Otherwise, get information about this domain from ElasticEMail:
+		{
+			$domains = json_decode($temp, true);
+			if (!empty($domains['success']))
+			{
+				$this_domain = parse_url($boardurl, PHP_URL_HOST);
+				foreach ($domains['data'] as $domain)
+				{
+					if (!empty($domain['domain']) && strpos($this_domain, $domain['domain']) !== false)
+						$context['elasticemail_domain'] = $domain;
+				}
+			}
+			if (empty($context['elasticemail_domain']))
+				$context['settings_insert_above'] = '<div class="errorbox">' . sprintf($txt['elasticemail_no_domain_found'], $this_domain) . '</div>';
+		}
+	}
+
 	// Saving the settings?
 	if (isset($_GET['save']))
 	{
@@ -127,6 +141,11 @@ function ElasticEMail_Settings($return_config = false)
 		function ElasticEMail_Test_API()
 		{
 			var api_key = document.getElementById("elasticemail_key").value;
+			if (!api_key)
+			{
+				alert(' . JavaScriptEscape($txt['elasticemail_test_failure']) . ');
+				return;
+			}
 			var xmlhttp = new XMLHttpRequest();
 			xmlhttp.onreadystatechange = function() 
 			{
