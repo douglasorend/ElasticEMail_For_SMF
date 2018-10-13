@@ -67,7 +67,7 @@ function ElasticEMail_Manage_Mail(&$subActions)
 ********************************************************************************/
 function ElasticEMail_Settings($return_config = false)
 {
-	global $txt, $scripturl, $context, $settings, $modSettings, $sourcedir, $boardurl;
+	global $txt, $scripturl, $context, $settings, $modSettings, $sourcedir, $boardurl, $forum_version;
 
 	// Make sure we can have permission to adminstrate the forum!
 	isAllowedTo('admin_forum');
@@ -122,7 +122,7 @@ function ElasticEMail_Settings($return_config = false)
 	if (!empty($context['elasticemail_domain']))
 	{
 		$config_vars[] = array('title', 'elasticemail_test_results');
-		$config_vars[] = array('callback', 'elasticemail_table');
+		$config_vars[] = array('callback', 'domain_configuration');
 	}
 
 	// Saving the settings?
@@ -166,38 +166,6 @@ function ElasticEMail_Settings($return_config = false)
 }
 
 /********************************************************************************
-* Template callback function:
-********************************************************************************/
-function template_callback_elasticemail_table()
-{
-	global $context, $txt, $forum_version, $settings;
-
-	// Check to see if everything is right to omit restriction message:
-	$r = array('domain' => '', 'spf' => 0, 'dkim' => 0, 'mx' => 0, 'dmarc' => 0, 'isrewritedomainvalid' => 0, 'verify' => 0);
-	if (!empty($context['elasticemail_domain']))
-		$r = &$context['elasticemail_domain'];
-	if (isset($_REQUEST['debug'])) { echo '<pre>';  print_r($r); echo '</pre>'; }
-
-	// The user needs to know what has been verified:
-	$ext = substr($forum_version, 0, 7) == 'SMF 2.1' ? '.png' : '.gif';
-	echo '
-						<dt>', $txt['elasticemail_results_domain'], '</dt>
-						<dd>', $r['domain'], '</dd>
-						<dt>', $txt['elasticemail_results_spf'], '</dt>
-						<dd><img src="', $settings['images_url'], '/icons/', !empty($r['spf']) ? 'field_valid' : 'quick_remove', $ext, '"></dd>
-						<dt>', $txt['elasticemail_results_dkim'], '</dt>
-						<dd><img src="', $settings['images_url'], '/icons/', !empty($r['dkim']) ? 'field_valid' : 'quick_remove', $ext, '"></dd>
-						<dt>', $txt['elasticemail_results_mx'], '</dt>
-						<dd><img src="', $settings['images_url'], '/icons/', !empty($r['mx']) ? 'field_valid' : 'quick_remove', $ext, '"></dd>
-						<dt>', $txt['elasticemail_results_dmarc'], '</dt>
-						<dd><img src="', $settings['images_url'], '/icons/', !empty($r['dmarc']) ? 'field_valid' : 'quick_remove', $ext, '"></dd>
-						<dt>', $txt['elasticemail_results_tracking'], '</dt>
-						<dd><img src="', $settings['images_url'], '/icons/', !empty($r['isrewritedomainvalid']) ? 'field_valid' : 'quick_remove', $ext, '"></dd>
-						<dt>', $txt['elasticemail_results_verify'], '</dt>
-						<dd><img src="', $settings['images_url'], '/icons/', !empty($r['verify']) ? 'field_valid' : 'quick_remove', $ext, '"></dd>';
-}
-
-/********************************************************************************
 * Subfunction that determines domain name of passed URL:
 * Solution copied & modified for SMF from: https://stackoverflow.com/a/7573307
 ********************************************************************************/
@@ -238,6 +206,41 @@ function ElasticEMail_domain($url)
 
 	// Either return the matched domain, or the host as determined by "parse_url":
     return isset($matches[0]) ? $matches[0] : $host;
+}
+
+/********************************************************************************
+* Template callback function dealing with display the domain configuration:
+********************************************************************************/
+function template_callback_domain_configuration()
+{
+	global $context, $txt, $forum_version, $settings;
+
+	// Check to see if everything is right to omit restriction message:
+	if (!empty($context['elasticemail_domain']))
+		$r = &$context['elasticemail_domain'];
+	if (isset($_REQUEST['debug'])) { echo '<pre>';  print_r($r); echo '</pre>'; }
+
+	// Decide what HTML to use for valid and invalid fields:
+	$smf20 = substr($forum_version, 0, 7) == 'SMF 2.0';
+	$valid = $smf20 ? '<img src="' . $settings['images_url'] . '/icons/field_valid.gif" />' : '<span class="generic_icons valid"></span>';
+	$invalid = $smf20 ? '<img src="' . $settings['images_url'] . '/icons/quick_remove.gif" />' : '<span class="generic_icons delete"></span>';
+
+	// The user needs to know what has been verified:
+	echo '
+						<dt>', $txt['elasticemail_results_domain'], '</dt>
+						<dd>', !empty($r['domain']) ? $r['domain'] : '', '</dd>
+						<dt>', $txt['elasticemail_results_spf'], '</dt>
+						<dd>', !empty($r['spf']) ? $valid : $invalid, '</dd>
+						<dt>', $txt['elasticemail_results_dkim'], '</dt>
+						<dd>', !empty($r['dkim']) ? $valid : $invalid, '</dd>
+						<dt>', $txt['elasticemail_results_mx'], '</dt>
+						<dd>', !empty($r['mx']) ? $valid : $invalid, '</dd>
+						<dt>', $txt['elasticemail_results_dmarc'], '</dt>
+						<dd>', !empty($r['dmarc']) ? $valid : $invalid, '</dd>
+						<dt>', $txt['elasticemail_results_tracking'], '</dt>
+						<dd>', !empty($r['isrewritedomainvalid']) ? $valid : $invalid, '</dd>
+						<dt>', $txt['elasticemail_results_verify'], '</dt>
+						<dd>', !empty($r['verify']) ? $valid : $invalid, '</dd>';
 }
 
 ?>

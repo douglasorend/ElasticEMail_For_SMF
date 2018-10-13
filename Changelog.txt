@@ -1,3 +1,7 @@
+v1.4 - December 30th, 2017
+o SMF 2.1: Fixed template function to use SMF 2.1 method for built-in icons.
+o Added Spanish translation, courtsey of [url=https://www.simplemachines.org/community/index.php?action=profile;u=2767]Juan Carlos[/url]!
+
 v1.3 - December 30th, 2017
 o Added code to properly determine domain name from URL.
 o Fixed issue where forum domain wasn't found in domain list from ElasticEMail.com.
