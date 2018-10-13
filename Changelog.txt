@@ -1,2 +1,6 @@
+v1.0.1 - August 4th, 2017
+o Removed line forcing a particular board URL.
+o Fixed template code involving image locations.
+
 v1.0 - August 2nd, 2017
 o Initial release

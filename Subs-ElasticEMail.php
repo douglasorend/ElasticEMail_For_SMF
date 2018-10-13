@@ -71,7 +71,6 @@ function ElasticEMail_Settings($return_config = false)
 	// Make sure we can have permission to adminstrate the forum!
 	isAllowedTo('admin_forum');
 
-$boardurl = 'http://www.xptsp.com/board';
 	// Check to see if we have PHP support for OpenSSL.  If we do, pull the domain list:
 	require_once($sourcedir . '/Subs-Package.php');
 	$temp = fetch_web_data('https://api.elasticemail.com/v2/domain/list?api_key=' . $modSettings['elasticemail_key']);
@@ -148,7 +147,7 @@ $boardurl = 'http://www.xptsp.com/board';
 
 function template_callback_elasticemail_table()
 {
-	global $context, $txt, $boardurl, $forum_version;
+	global $context, $txt, $boardurl, $forum_version, $settings;
 
 	// Check to see if everything is right to omit restriction message:
 	$r = array('domain' => '', 'spf' => 0, 'dkim' => 0, 'mx' => 0, 'dmarc' => 0, 'IsRewriteDomainValid' => 0, 'verify' => 0);
@@ -164,17 +163,17 @@ function template_callback_elasticemail_table()
 						<dt>', $txt['elasticemail_results_domain'], '</dt>
 						<dd>', $r['domain'], '</dd>
 						<dt>', $txt['elasticemail_results_spf'], '</dt>
-						<dd><img src="', $boardurl, '/Themes/default/images/icons/', !empty($r['spf']) ? 'field_valid' : 'quick_remove', $ext, '"></dd>
+						<dd><img src="', $settings['images_url'], '/icons/', !empty($r['spf']) ? 'field_valid' : 'quick_remove', $ext, '"></dd>
 						<dt>', $txt['elasticemail_results_dkim'], '</dt>
-						<dd><img src="', $boardurl, '/Themes/default/images/icons/', !empty($r['dkim']) ? 'field_valid' : 'quick_remove', $ext, '"></dd>
+						<dd><img src="', $settings['images_url'], '/icons/', !empty($r['dkim']) ? 'field_valid' : 'quick_remove', $ext, '"></dd>
 						<dt>', $txt['elasticemail_results_mx'], '</dt>
-						<dd><img src="', $boardurl, '/Themes/default/images/icons/', !empty($r['mx']) ? 'field_valid' : 'quick_remove', $ext, '"></dd>
+						<dd><img src="', $settings['images_url'], '/icons/', !empty($r['mx']) ? 'field_valid' : 'quick_remove', $ext, '"></dd>
 						<dt>', $txt['elasticemail_results_dmarc'], '</dt>
-						<dd><img src="', $boardurl, '/Themes/default/images/icons/', !empty($r['dmarc']) ? 'field_valid' : 'quick_remove', $ext, '"></dd>
+						<dd><img src="', $settings['images_url'], '/icons/', !empty($r['dmarc']) ? 'field_valid' : 'quick_remove', $ext, '"></dd>
 						<dt>', $txt['elasticemail_results_tracking'], '</dt>
-						<dd><img src="', $boardurl, '/Themes/default/images/icons/', !empty($r['IsRewriteDomainValid']) ? 'field_valid' : 'quick_remove', $ext, '"></dd>
+						<dd><img src="', $settings['images_url'], '/icons/', !empty($r['IsRewriteDomainValid']) ? 'field_valid' : 'quick_remove', $ext, '"></dd>
 						<dt>', $txt['elasticemail_results_verify'], '</dt>
-						<dd><img src="', $boardurl, '/Themes/default/images/icons/', !empty($r['verify']) ? 'field_valid' : 'quick_remove', $ext, '"></dd>';
+						<dd><img src="', $settings['images_url'], '/icons/', !empty($r['verify']) ? 'field_valid' : 'quick_remove', $ext, '"></dd>';
 }
 
 ?>
