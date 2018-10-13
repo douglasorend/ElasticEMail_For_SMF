@@ -1,0 +1,2 @@
+v1.0 - August 2nd, 2017
+o Initial release

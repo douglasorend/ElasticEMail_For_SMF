@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE modification SYSTEM "http://www.simplemachines.org/xml/modification">
+<modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
+<id>Dougiefresh:ElasticEMail</id>
+<name>Elastic EMail for SMF</name>
+<version>1.0</version>
+
+<file name="$sourcedir/Subs-Post.php">
+	<operation>
+		<search position="before"><![CDATA[global $webmaster_email, $context, $modSettings, $txt, $scripturl]]></search>
+		<add><![CDATA[, $sourcedir]]></add>
+	</operation>
+	<operation>
+		<search position="after"><![CDATA[// Sending HTML?  Let's plop in some basic stuff, then.]]></search>
+		<add><![CDATA[// Sending email via Elastic EMail servers?
+	require_once($sourcedir . '/Subs-ElasticEMail.php');
+	if (ElasticEMail_send($to_array, $subject, $message, $from, $send_html))
+		return true;
+
+	]]></add>
+	</operation>
+</file>
+<file name="$sourcedir/ManageMail.php">
+	<operation>
+		<search position="before"><![CDATA['settings' => 'ModifyMailSettings',]]></search>
+		<add><![CDATA[
+		'elastic' => 'ElasticEMail_Settings',]]></add>
+	</operation>
+</file>
+</modification>
