@@ -26,7 +26,6 @@ $txt['elasticemail_results_dkim'] = 'Valid DKIM record?';
 $txt['elasticemail_results_mx'] = 'Valid MX record?';
 $txt['elasticemail_results_dmarc'] = 'Valid DMARC record?';
 $txt['elasticemail_results_tracking'] = 'Tracking CNAME record is verified?';
-$txt['elasticemail_results_verify'] = 'Verification is available?';
 $txt['elasticemail_no_domain_found'] = '<strong>WARNING:</strong> No domain status found for domain "%s".  This does not mean that this mod will not function, though.';
 
 ?>

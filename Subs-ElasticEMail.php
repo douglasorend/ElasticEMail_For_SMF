@@ -238,9 +238,7 @@ function template_callback_domain_configuration()
 						<dt>', $txt['elasticemail_results_dmarc'], '</dt>
 						<dd>', !empty($r['dmarc']) ? $valid : $invalid, '</dd>
 						<dt>', $txt['elasticemail_results_tracking'], '</dt>
-						<dd>', !empty($r['isrewritedomainvalid']) ? $valid : $invalid, '</dd>
-						<dt>', $txt['elasticemail_results_verify'], '</dt>
-						<dd>', !empty($r['verify']) ? $valid : $invalid, '</dd>';
+						<dd>', !empty($r['isrewritedomainvalid']) ? $valid : $invalid, '</dd>';
 }
 
 ?>
