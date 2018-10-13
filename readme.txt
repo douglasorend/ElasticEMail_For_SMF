@@ -1,5 +1,5 @@
 [hr]
-[center][color=red][size=16pt][b]ELASTIC EMAIL MOD v1.5[/b][/size][/color]
+[center][color=red][size=16pt][b]ELASTIC EMAIL MOD v1.6[/b][/size][/color]
 [url=http://www.simplemachines.org/community/index.php?action=profile;u=253913][b]By Dougiefresh[/b][/url] -> [url=http://custom.simplemachines.org/mods/index.php?mod=4153]Link to Mod[/url]
 [/center]
 [hr]
@@ -22,7 +22,8 @@ BE FOREWARNED: [b]I WILL NOT ASSIST WITH DOMAIN DNS RECORD CHANGES!!![/b]  You h
 There is a new section under [b]Admin[/b] -> [b]Maintenance[/b] -> [b]Mail[/b] -> [b]Elastic EMail[/b].
 
 [color=blue][b][size=12pt][u]Translators[/u][/size][/b][/color]
-o Spanish Latin: [url=https://www.simplemachines.org/community/index.php?action=profile;u=2767]Juan Carlos[/url]
+o Spanish: [url=https://www.simplemachines.org/community/index.php?action=profile;u=2767]Juan Carlos[/url]
+o Spanish Latin: [url=https://www.simplemachines.org/community/index.php?action=profile;u=322597]Rock Lee[/url]
 
 [color=blue][b][size=12pt][u]Compatibility Notes[/u][/size][/b][/color]
 This mod was tested on SMF 2.0.13 and SMF 2.1 Beta 3, but should work on SMF 2.0 and up.  SMF 1.x is not and will not be supported.  

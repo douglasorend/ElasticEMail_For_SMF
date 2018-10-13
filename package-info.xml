@@ -5,7 +5,7 @@
 	<id>Dougiefresh:ElasticEMail</id>
 	<name>Elastic EMail for SMF</name>
 	<type>modification</type>
-	<version>1.5</version>
+	<version>1.6</version>
 
 	<install for="2.0 - 2.0.99, 2.1 Beta 3">
 		<readme parsebbc="true">readme.txt</readme>
@@ -14,6 +14,8 @@
 		<require-file name="Subs-ElasticEMail.php" destination="$sourcedir" />
 		<require-file name="ElasticEMail.english.php" destination="$languagedir" />
 		<require-file name="ElasticEMail.spanish_es.php" destination="$languagedir" />
+		<require-file name="ElasticEMail.spanish_latin.php" destination="$languagedir" />
+		<require-file name="ElasticEMail.spanish_latin-utf8.php" destination="$languagedir" />
 		<redirect url="index.php?action=admin;area=mailqueue;sa=elastic" timeout="5000" />
 	</install>
 	<uninstall for="2.0 - 2.0.99, 2.1 Beta 3">
@@ -22,5 +24,7 @@
 		<remove-file name="$sourcedir/Subs-ElasticEMail.php" />
 		<remove-file name="$languagedir/ElasticEMail.english.php" />
 		<remove-file name="$languagedir/ElasticEMail.spanish_es.php" />
+		<remove-file name="$languagedir/ElasticEMail.spanish_latin.php" />
+		<remove-file name="$languagedir/ElasticEMail.spanish_latin-utf8.php" />
 	</uninstall>
 </package-info>
