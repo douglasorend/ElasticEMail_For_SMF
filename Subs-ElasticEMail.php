@@ -71,6 +71,7 @@ function ElasticEMail_Settings($return_config = false)
 
 	// Make sure we can have permission to adminstrate the forum!
 	isAllowedTo('admin_forum');
+	loadLanguage('ElasticEmail');
 
 	// Check to see if we have PHP support for OpenSSL.  If we do, pull the domain list:
 	require_once($sourcedir . '/Subs-Package.php');
@@ -80,7 +81,7 @@ function ElasticEMail_Settings($return_config = false)
 
 	// If OpenSSL support doesn't exist, notify user:
 	if (empty($temp))
-		$context['settings_insert_above'] = '<div class="errorbox">' . $txt['elasticeamil_no_ssl_support'] . '</div>';
+		$context['settings_insert_above'] = '<div class="errorbox">' . $txt['elasticemail_no_ssl_support'] . '</div>';
 	else
 	// Otherwise, get information about this domain from ElasticEMail:
 	{
@@ -95,7 +96,7 @@ function ElasticEMail_Settings($return_config = false)
 			}
 		}
 		if (empty($context['elasticemail_domain']))
-			$context['settings_insert_above'] = '<div class="errorbox">' . $txt['elasticemail_no_domain_found'] . '</div>';
+			$context['settings_insert_above'] = '<div class="errorbox">' . sprintf($txt['elasticemail_no_domain_found'], $this_domain) . '</div>';
 	}
 
 	// Our mod configuration variables:
