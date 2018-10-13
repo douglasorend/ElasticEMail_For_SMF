@@ -41,7 +41,7 @@ function ElasticEMail_send($recipients, $subject, $message, $from_name, $reply_t
 	$posted_data = '';
 	foreach ($post_data as $key => $val)
 		$posted_data .= (empty($posted_data) ? '' : '&') . $key . '=' . urlencode($val);
-	$temp = fetch_web_data('https://api.elasticemail.com/' . $url, $posted_data);
+	$temp = fetch_web_data('http' . (!empty($modSettings['elasticemail_no_ssl']) ? '' : 's') . '://api.elasticemail.com/' . $url, $posted_data);
 	$output = json_decode($context['elasticemail_response'] = $temp, true);
 	return ($return_output = false ? $output : $output['success']);
 }
@@ -73,18 +73,24 @@ function ElasticEMail_Settings($return_config = false)
 
 	// Check to see if we have PHP support for OpenSSL.  If we do, pull the domain list:
 	require_once($sourcedir . '/Subs-Package.php');
-	$temp = fetch_web_data('https://api.elasticemail.com/v2/domain/list?api_key=' . $modSettings['elasticemail_key']);
+	$temp = fetch_web_data('http' . (!empty($modSettings['elasticemail_no_ssl']) ? '' : 's') . '://api.elasticemail.com/v2/domain/list?api_key=' . $modSettings['elasticemail_key']);
 	$context['elasticemail_domain'] = array();
-	if (!empty($temp))
+
+	// If OpenSSL support doesn't exist, notify user:
+	if (empty($temp))
+		$context['settings_insert_above'] = '<div class="errorbox">' . $txt['elasticeamil_no_ssl_support'] . '</div>';
+	else
+	// Otherwise, get information about this domain from ElasticEMail:
 	{
 		$domains = json_decode($temp, true);
 		if (!empty($domains['success']))
 		{
 			if (strpos($boardurl, 'http://') !== 0 && strpos($boardurl, 'https://') !== 0)
 				$boardurl = 'http://' . $boardurl;
+			$this_domain = parse_url($boardurl, PHP_URL_HOST);
 			foreach ($domains['data'] as $domain)
 			{
-				if (!empty($domain['domain']) && strpos($boardurl, $domain['domain']))
+				if (!empty($domain['domain']) && strpos($this_domain, $domain['domain']) !== false)
 					$context['elasticemail_domain'] = $domain;
 			}
 		}
@@ -92,12 +98,16 @@ function ElasticEMail_Settings($return_config = false)
 
 	// Our mod configuration variables:
 	$config_vars = array(
-		array('check', 'elasticemail_enable'),
+		array('check', 'elasticemail_enable', 'disabled' => empty($context['elasticemail_domain'])),
+		array('check', 'elasticemail_no_ssl'),
 		array('text', 'elasticemail_key', 37, 'postinput' => '<br /><input type="submit" value="' . $txt['elasticemail_test_api'] . '" onclick="ElasticEMail_Test_API(); return false;" class="button_submit" />'),
-		//'',
-		array('title', 'elasticemail_test_results'),
-		array('callback', 'elasticemail_table'),
+		
 	);
+	if (!empty($context['elasticemail_domain']))
+	{
+		$config_vars[] = array('title', 'elasticemail_test_results');
+		$config_vars[] = array('callback', 'elasticemail_table');
+	}
 	if ($return_config)
 		return $config_vars;
 
@@ -109,10 +119,6 @@ function ElasticEMail_Settings($return_config = false)
 		redirectexit('action=admin;area=mailqueue;sa=elastic');
 	}
 	
-	// If OpenSSL support doesn't exist, notify user:
-	if (empty($context['elasticemail_domain']))
-		$context['settings_insert_above'] = '<div class="errorbox">' . $txt['elasticeamil_no_ssl_support'] . '</div>';
-
 	// Our javascript for testing whether the API key given is valid:
 	$context['settings_post_javascript'] = '
 		function ElasticEMail_Test_API()
@@ -150,12 +156,10 @@ function template_callback_elasticemail_table()
 	global $context, $txt, $boardurl, $forum_version, $settings;
 
 	// Check to see if everything is right to omit restriction message:
-	$r = array('domain' => '', 'spf' => 0, 'dkim' => 0, 'mx' => 0, 'dmarc' => 0, 'IsRewriteDomainValid' => 0, 'verify' => 0);
+	$r = array('domain' => '', 'spf' => 0, 'dkim' => 0, 'mx' => 0, 'dmarc' => 0, 'isrewritedomainvalid' => 0, 'verify' => 0);
 	if (!empty($context['elasticemail_domain']))
 		$r = &$context['elasticemail_domain'];
-	$test = !empty($r['spf']) && !empty($r['dkim']) && !empty($r['mx']) && !empty($r['dmarc']) && !empty($r['IsRewriteDomainValid']) && !empty($r['verify']);
-	if (!$test)
-		echo '<div class="errorbox">', $txt['elasticemail_restricted'], '</div>';
+	if (isset($_REQUEST['debug'])) { echo '<pre>';  print_r($r); echo '</pre>'; }
 
 	// The user needs to know what has been verified:
 	$ext = substr($forum_version, 0, 7) == 'SMF 2.1' ? '.png' : '.gif';
@@ -171,7 +175,7 @@ function template_callback_elasticemail_table()
 						<dt>', $txt['elasticemail_results_dmarc'], '</dt>
 						<dd><img src="', $settings['images_url'], '/icons/', !empty($r['dmarc']) ? 'field_valid' : 'quick_remove', $ext, '"></dd>
 						<dt>', $txt['elasticemail_results_tracking'], '</dt>
-						<dd><img src="', $settings['images_url'], '/icons/', !empty($r['IsRewriteDomainValid']) ? 'field_valid' : 'quick_remove', $ext, '"></dd>
+						<dd><img src="', $settings['images_url'], '/icons/', !empty($r['isrewritedomainvalid']) ? 'field_valid' : 'quick_remove', $ext, '"></dd>
 						<dt>', $txt['elasticemail_results_verify'], '</dt>
 						<dd><img src="', $settings['images_url'], '/icons/', !empty($r['verify']) ? 'field_valid' : 'quick_remove', $ext, '"></dd>';
 }

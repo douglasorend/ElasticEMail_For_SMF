@@ -1,3 +1,9 @@
+v1.0.2 - August 16th, 2017
+o Removed message about 50 email limit.
+o Changed code so that API is properly checked in PHP code.
+o Added option to use HTTP instead of HTTPS for ElasticEmail calls.
+o Domain configuration results now show only if domain is linked to account.
+
 v1.0.1 - August 4th, 2017
 o Removed line forcing a particular board URL.
 o Fixed template code involving image locations.
