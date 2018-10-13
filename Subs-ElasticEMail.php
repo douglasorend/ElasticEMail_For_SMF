@@ -12,7 +12,7 @@ if (!defined('SMF'))
 /********************************************************************************
 * The primary workhorse of this mod: The mail sender!
 ********************************************************************************/
-function ElasticEMail_send($recipients, $subject, $message, $from_name, $reply_to = null, $send_html = false, $check_api = false)
+function ElasticEMail_send($recipients, $subject, $message, $from_name, $reply_to = null, $send_html = false)
 {
 	global $modSettings, $webmaster_email, $context, $sourcedir;
 
@@ -41,9 +41,10 @@ function ElasticEMail_send($recipients, $subject, $message, $from_name, $reply_t
 	$posted_data = '';
 	foreach ($post_data as $key => $val)
 		$posted_data .= (empty($posted_data) ? '' : '&') . $key . '=' . urlencode($val);
-	$temp = fetch_web_data('http' . (!empty($modSettings['elasticemail_no_ssl']) ? '' : 's') . '://api.elasticemail.com/' . $url, $posted_data);
+	$protocol = !empty($modSettings['elasticemail_no_ssl']) ? 'http' : 'https';
+	$temp = fetch_web_data($protocol . '://api.elasticemail.com/v2/email/send', $posted_data);
 	$output = json_decode($context['elasticemail_response'] = $temp, true);
-	return ($return_output = false ? $output : $output['success']);
+	return isset($output['success']) ? $output['success'] : false;
 }
 
 /********************************************************************************
@@ -73,7 +74,8 @@ function ElasticEMail_Settings($return_config = false)
 
 	// Check to see if we have PHP support for OpenSSL.  If we do, pull the domain list:
 	require_once($sourcedir . '/Subs-Package.php');
-	$temp = fetch_web_data('http' . (!empty($modSettings['elasticemail_no_ssl']) ? '' : 's') . '://api.elasticemail.com/v2/domain/list?api_key=' . $modSettings['elasticemail_key']);
+	$protocol = !empty($modSettings['elasticemail_no_ssl']) ? 'http' : 'https';
+	$temp = fetch_web_data($protocol . '://api.elasticemail.com/v2/domain/list?api_key=' . $modSettings['elasticemail_key']);
 	$context['elasticemail_domain'] = array();
 
 	// If OpenSSL support doesn't exist, notify user:

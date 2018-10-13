@@ -1,5 +1,5 @@
 [hr]
-[center][color=red][size=16pt][b]ELASTIC EMAIL MOD v1.0.2[/b][/size][/color]
+[center][color=red][size=16pt][b]ELASTIC EMAIL MOD v1.0.3[/b][/size][/color]
 [url=http://www.simplemachines.org/community/index.php?action=profile;u=253913][b]By Dougiefresh[/b][/url] -> [url=http://custom.simplemachines.org/mods/index.php?mod=4153]Link to Mod[/url]
 [/center]
 [hr]
@@ -19,6 +19,7 @@ You also must be able to modify your domain's DNS records in order to maximize t
 BE FOREWARNED: [b]I WILL NOT ASSIST WITH DOMAIN DNS RECORD CHANGES!!![/b]  You have been warned!  If you are (1) uncomfortable with, or (2) unable to make these changes, this mod is [b]NOT FOR YOU![/b]
 
 [color=blue][b][size=12pt][u]Admin Settings[/u][/size][/b][/color]
+There is a new section under [b]Admin[/b] -> [b]Maintenance[/b] -> [b]Mail[/b] -> [b]Elastic EMail[/b].
 
 [color=blue][b][size=12pt][u]Compatibility Notes[/u][/size][/b][/color]
 This mod was tested on SMF 2.0.13, but should work on SMF 2.0 and up.  SMF 1.x is not and will not be supported.  
